@@ -59,11 +59,11 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
 
 
         public AcquireTokenInteractiveHandler(
-            RequestData requestData, 
-            Uri redirectUri, 
+            RequestData requestData,
+            Uri redirectUri,
             IPlatformParameters platformParameters,
-            UserIdentifier userId, 
-            string extraQueryParameters, 
+            UserIdentifier userId,
+            string extraQueryParameters,
             //IWebUI webUI, 
             string claims)
             : base(requestData)
@@ -129,7 +129,7 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
             }
 
             return WebUIFactoryProvider.WebUIFactory.CreateAuthenticationDialog(
-                parametersObj.GetCoreUIParent(), 
+                parametersObj.GetCoreUIParent(),
                 base.RequestContext);
         }
 
@@ -164,7 +164,7 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
             await this.AcquireAuthorizationAsync().ConfigureAwait(false);
             this.VerifyAuthorizationResult();
 
-            if(!string.IsNullOrEmpty(authorizationResult.CloudInstanceHost))
+            if (!string.IsNullOrEmpty(authorizationResult.CloudInstanceHost))
             {
                 var updatedAuthority = ReplaceHost(Authenticator.Authority, authorizationResult.CloudInstanceHost);
 
@@ -261,13 +261,13 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
                 var platformInformation = new PlatformInformation();
                 platformInformation.AddPromptBehaviorQueryParameter(this.authorizationParameters, authorizationRequestParameters);
             }
-            
-                IDictionary<string, string> adalIdParameters = AdalIdHelper.GetAdalIdParameters();
-                foreach (KeyValuePair<string, string> kvp in adalIdParameters)
-                {
-                    authorizationRequestParameters[kvp.Key] = kvp.Value;
-                }
-            
+
+            IDictionary<string, string> adalIdParameters = AdalIdHelper.GetAdalIdParameters();
+            foreach (KeyValuePair<string, string> kvp in adalIdParameters)
+            {
+                authorizationRequestParameters[kvp.Key] = kvp.Value;
+            }
+
 
             if (!string.IsNullOrWhiteSpace(extraQueryParameters))
             {
@@ -311,13 +311,14 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
         protected override bool BrokerInvocationRequired()
         {
             if (this.authorizationResult != null
-                && !string.IsNullOrEmpty(this.authorizationResult.Code)
-                && this.authorizationResult.Code.StartsWith("msauth://", StringComparison.OrdinalIgnoreCase))
+    && !string.IsNullOrEmpty(this.authorizationResult.Code)
+    && this.authorizationResult.Code.StartsWith("msauth://", StringComparison.OrdinalIgnoreCase))
             {
+                System.Diagnostics.Debug.WriteLine("broker invocation required. auth code starts with msauth://" );
                 this.BrokerParameters[BrokerParameter.BrokerInstallUrl] = this.authorizationResult.Code;
                 return true;
             }
-
+            System.Diagnostics.Debug.WriteLine("broker invocation not required. auth code does not start with msauth://");
             return false;
         }
     }

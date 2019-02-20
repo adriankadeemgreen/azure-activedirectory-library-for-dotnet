@@ -61,6 +61,8 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Platform
             get
             {
                 PlatformParameters pp = PlatformParameters as PlatformParameters;
+
+                System.Diagnostics.Debug.WriteLine("using PlatformParameters. Use broker set to: {0}", pp.UseBroker);
                 if (pp == null)
                 {
                     return false;
@@ -70,12 +72,13 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Platform
 
                 if (pp.UseBroker)
                 {
+                    System.Diagnostics.Debug.WriteLine("invoking the broker");
                     pp.CallerViewController.InvokeOnMainThread(() =>
                     {
                         res = UIApplication.SharedApplication.CanOpenUrl(new NSUrl("msauth://"));
                     });
                 }
-
+                System.Diagnostics.Debug.WriteLine("Result of invoking broker. True, broker is installed, false if not. {0}", res);
                 return res;
             }
         }

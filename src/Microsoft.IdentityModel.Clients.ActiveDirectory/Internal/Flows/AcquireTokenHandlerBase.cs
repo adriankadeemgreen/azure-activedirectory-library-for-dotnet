@@ -157,6 +157,8 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
                 {
                     RequestContext.Logger.Verbose("Loading from cache.");
 
+                    System.Diagnostics.Debug.WriteLine("AcquireTokenHandlerBase RunAsync. Trying to load from cache");
+
                     CacheQueryData.Authority = Authenticator.Authority;
                     CacheQueryData.Resource = this.Resource;
                     CacheQueryData.ClientId = this.ClientKey.ClientId;
@@ -187,6 +189,7 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
                 if (ResultEx == null || ResultEx.Exception != null)
                 {
                     RequestContext.Logger.Verbose("Either a token was not found or an exception was thrown.");
+                    System.Diagnostics.Debug.WriteLine("Token was not found, or an exception thrown. Checking for broker");
 
                     if (BrokerHelper.CanInvokeBroker)
                     {
@@ -196,6 +199,7 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
                     else
                     {
                         RequestContext.Logger.Verbose("Cannot invoke the broker directly, may require install ...");
+                        System.Diagnostics.Debug.WriteLine("Cannot invoke the broker directly, may require install ...");
 
                         await PreTokenRequestAsync().ConfigureAwait(false);
                         // check if broker app installation is required for authentication.
@@ -257,15 +261,18 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
         private async Task CheckAndAcquireTokenUsingBrokerAsync()
         {
             RequestContext.Logger.Verbose("Check and AcquireToken using broker ");
+            System.Diagnostics.Debug.WriteLine("Check and AcquireToken using broker ");
 
             if (BrokerInvocationRequired())
             {
                 RequestContext.Logger.Verbose("Broker invocation is required");
+                System.Diagnostics.Debug.WriteLine("Broker invocation is required");
                 ResultEx = await BrokerHelper.AcquireTokenUsingBrokerAsync(BrokerParameters).ConfigureAwait(false);
             }
             else
             {
                 RequestContext.Logger.Verbose("Broker invocation is NOT required");
+                System.Diagnostics.Debug.WriteLine("Broker invocation is NOT required");
                 ResultEx = await this.SendTokenRequestAsync().ConfigureAwait(false);
             }
         }
@@ -333,6 +340,7 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
                 { OAuth2Parameter.ClientInfo, "1" }
             };
             AddAdditionalRequestParameters(requestParameters);
+            System.Diagnostics.Debug.WriteLine("Request parameters. Resource: {0}", Resource);
             return await SendHttpMessageAsync(requestParameters).ConfigureAwait(false);
         }
 
@@ -401,6 +409,7 @@ namespace Microsoft.IdentityModel.Clients.ActiveDirectory.Internal.Flows
             _client = new AdalHttpClient(Authenticator.TokenUri, RequestContext)
                 {Client = {BodyParameters = requestParameters}};
             TokenResponse tokenResponse = await _client.GetResponseAsync<TokenResponse>().ConfigureAwait(false);
+            System.Diagnostics.Debug.WriteLine("Token Response: {0}", tokenResponse.IdTokenString);
             return tokenResponse.GetResult();
         }
 
